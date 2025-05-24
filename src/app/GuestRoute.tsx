@@ -14,7 +14,7 @@ export default function GuestRoute({ children }: { children: ReactNode }) {
       setRender(true)
     }
     setRender(true)
-  }, [authContext.isAuthenticated])
+  }, [authContext.isAuthenticated, router])
 
   if (render && !authContext.isAuthenticated) return (
     <>{children}</>

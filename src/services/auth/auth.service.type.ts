@@ -25,7 +25,9 @@ export interface RegisterVerifyOtpPayloadProps {
   otp_id: string
 }
 
-export interface RegisterVerifyOtpProps extends BaseResponse { }
+export interface RegisterVerifyOtpProps extends BaseResponse {
+  data: null
+}
 
 /**
  * Register Resend OTP
@@ -142,4 +144,6 @@ export interface ForgotPasswordResetOtpPayloadProps {
   token: string
 }
 
-export interface ForgotPasswordResetOtpProps extends BaseResponse { }
+export interface ForgotPasswordResetOtpProps extends BaseResponse {
+  data: null
+}

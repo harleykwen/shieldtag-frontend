@@ -19,16 +19,11 @@ export default function Otp(props: OtpProps) {
   const [tempExpiredAt, setTempExpiredAt] = useState<number | null>(null)
   const [secondsLeft, setSecondsLeft] = useState(0)
 
-  function getSecondsLeft() {
-    if (!expiredAt) return 0
-    return Math.max(differenceInSeconds(new Date(expiredAt), new Date()), 0)
-  }
-
   useEffect(() => {
     if (!tempExpiredAt) return
     const expiryDate = new Date(tempExpiredAt)
     const updateCountdown = () => {
-      const diff = differenceInSeconds(tempExpiredAt, new Date())
+      const diff = differenceInSeconds(expiryDate, new Date())
       setSecondsLeft(diff > 0 ? diff : 0)
     }
 
@@ -52,7 +47,7 @@ export default function Otp(props: OtpProps) {
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Verify OTP</h1>
         <p className="text-balance text-sm text-muted-foreground">
-          We've sent an One-Time Password (OTP) to your registered email address. Please check your inbox (and spam folder, just in case)
+          We have sent an One-Time Password (OTP) to your registered email address. Please check your inbox (and spam folder, just in case)
         </p>
       </div>
       <div className="flex flex-col gap-5 items-center">

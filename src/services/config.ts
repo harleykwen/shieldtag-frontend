@@ -16,7 +16,7 @@ function getCookie(name: string): string | null {
 }
 
 // Add a request interceptor
-httpInstance.interceptors.request.use(function (config: InternalAxiosRequestConfig<any>) {
+httpInstance.interceptors.request.use(function (config: InternalAxiosRequestConfig) {
   // Do something before request is sent
   const token = getCookie('token')
   if (token) {
@@ -29,7 +29,7 @@ httpInstance.interceptors.request.use(function (config: InternalAxiosRequestConf
 })
 
 // Add a response interceptor
-httpInstance.interceptors.response.use(function (response: AxiosResponse<any, any>) {
+httpInstance.interceptors.response.use(function (response: AxiosResponse) {
   // Any status code that lie within the range of 2xx cause this function to trigger
   // Do something with response data
   return response

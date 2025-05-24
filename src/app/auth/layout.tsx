@@ -1,8 +1,8 @@
 'use client';
 
-import { GalleryVerticalEnd } from 'lucide-react';
 import React from 'react'
 import GuestRoute from '../GuestRoute';
+import Image from 'next/image';
 
 export default function AuthLayout({
   children,
@@ -20,8 +20,10 @@ export default function AuthLayout({
           </div>
         </div>
         <div className="relative hidden bg-muted lg:block">
-          <img
+          <Image
             src="/logo.svg"
+            width={100}
+            height={100}
             alt="Image"
             className="absolute m-auto inset-0 w-[300px] object-cover dark:brightness-[0.2] dark:grayscale"
           />
