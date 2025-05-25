@@ -14,7 +14,7 @@ import { useRouter } from 'next/navigation'
 import ReCAPTCHA from 'react-google-recaptcha'
 import { Eye, EyeOff } from "lucide-react";
 import clsx from "clsx";
-import { getPasswordStrength, getStrengthColor } from "@/lib/password";
+import { getPasswordStrength } from "@/lib/password";
 
 export default function Register() {
   const router = useRouter()
