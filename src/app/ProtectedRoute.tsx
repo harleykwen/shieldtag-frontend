@@ -17,7 +17,9 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
     setRender(true)
   }, [authContext.isAuthenticated, router])
 
-  if (render && authContext.isAuthenticated) return (
+  console.log(authContext.isAuthenticated, authContext.user)
+
+  if (render && authContext.isAuthenticated && authContext.user) return (
     <>{children}</>
   )
 

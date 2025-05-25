@@ -12,10 +12,14 @@ import { useMutation } from "@tanstack/react-query";
 import authService from "@/services/auth/auth.service";
 import { toast } from "sonner";
 import ReCAPTCHA from 'react-google-recaptcha'
+import { useAuth } from "@/context/AuthContext";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
   const router = useRouter()
+  const authContext = useAuth()
 
+  const [showPassword, setShowPassword] = useState<boolean>(false)
   const [isOtp, setIsOtp] = useState<boolean>(false)
   const [otp, setOtp] = useState<string>('')
   const [formData, setFormData] = useState<LoginPayloadProps>({
@@ -63,6 +67,7 @@ export default function Login() {
       expires.setDate(expires.getDate() + 7)
       document.cookie = `token=${token}; path=/; expires=${expires.toUTCString()}; SameSite=Lax; Secure`
       router.replace('/')
+      authContext.authenticate()
     },
     onError: (error) => {
       const errorMessage = Array.isArray(error?.message) ? error?.message[0]?.msg : error?.message
@@ -123,14 +128,23 @@ export default function Login() {
         </div>
         <div className="grid gap-2">
           <Label htmlFor="password">Password</Label>
-          <Input 
-            id="password" 
-            type="password" 
-            name="password"
-            required 
-            value={formData.password}
-            onChange={(e) => handleChangeFormData(e.target.name, e.target.value)}
-          />
+          <div className="relative w-full max-w-sm">
+            <Input 
+              id="password" 
+              type={showPassword ? 'text' : "password"} 
+              name="password"
+              required 
+              value={formData.password}
+              onChange={(e) => handleChangeFormData(e.target.name, e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(prev => !prev)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
         </div>
         <Link href="/auth/forgot-password" className="mx-auto text-sm">
           Forgot Password

@@ -7,6 +7,7 @@ import profileService from '@/services/profile/profile.service'
 interface AuthContextType {
   user: { email: string } | undefined
   isAuthenticated: boolean
+  authenticate: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -25,11 +26,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     )
   }
 
-  const user = profileQuery.data?.data
-  const isAuthenticated = !!user?.email
+  const user = profileQuery?.isSuccess ? profileQuery.data?.data : undefined
+  const isAuthenticated = profileQuery?.isSuccess ? !!user?.email : false
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        isAuthenticated,
+        authenticate: profileQuery?.refetch
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )

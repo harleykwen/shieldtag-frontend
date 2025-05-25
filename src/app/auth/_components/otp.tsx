@@ -16,24 +16,27 @@ interface OtpProps {
 export default function Otp(props: OtpProps) {
   const { otp, setOtp, onResend, onVerify, isResending, isVerifying, expiredAt } = props
 
-  const [tempExpiredAt, setTempExpiredAt] = useState<number | null>(null)
   const [secondsLeft, setSecondsLeft] = useState(0)
 
   useEffect(() => {
-    if (!tempExpiredAt) return
-    const expiryDate = new Date(tempExpiredAt)
+    if (!expiredAt) {
+      setSecondsLeft(0)
+      return
+    }
+
+    const expiryDate = new Date(expiredAt)
     const updateCountdown = () => {
       const diff = differenceInSeconds(expiryDate, new Date())
       setSecondsLeft(diff > 0 ? diff : 0)
     }
 
-    updateCountdown()
-    const timer = setInterval(updateCountdown, 1000)
-    return () => clearInterval(timer)
-  }, [tempExpiredAt])
+    updateCountdown() // initial call
 
-  useEffect(() => {
-    if (expiredAt) setTempExpiredAt(expiredAt)
+    const timer = setInterval(() => {
+      updateCountdown()
+    }, 1000)
+
+    return () => clearInterval(timer)
   }, [expiredAt])
 
   const formatTime = (totalSeconds: number) => {
@@ -69,7 +72,7 @@ export default function Otp(props: OtpProps) {
         <Button 
           className="w-full" 
           onClick={onVerify}
-          disabled={isVerifying}
+          disabled={isVerifying || otp.trim().length < 6 || secondsLeft === 0}
         >
           {isVerifying ? 'Verifying...' : 'Verify'}
         </Button>
@@ -77,10 +80,10 @@ export default function Otp(props: OtpProps) {
           variant='outline'
           className="w-full" 
           onClick={onResend}
-          disabled={isResending || secondsLeft != 0}
+          disabled={isResending || secondsLeft !== 0}
         >
           {secondsLeft === 0
-            ? `Resend OTP in ${isResending ? '...' : ''}`
+            ? `Resend OTP${isResending ? '...' : ''}`
             : `Resend OTP in ${formatTime(secondsLeft)}`
           }
         </Button>

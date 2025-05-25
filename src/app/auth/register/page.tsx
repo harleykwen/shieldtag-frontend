@@ -12,10 +12,14 @@ import authService from "@/services/auth/auth.service";
 import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import ReCAPTCHA from 'react-google-recaptcha'
+import { Eye, EyeOff } from "lucide-react";
+import clsx from "clsx";
+import { getPasswordStrength, getStrengthColor } from "@/lib/password";
 
 export default function Register() {
   const router = useRouter()
 
+  const [showPassword, setShowPassword] = useState<boolean>(false)
   const [isOtp, setIsOtp] = useState<boolean>(false)
   const [otp, setOtp] = useState<string>('')
   const [formData, setFormData] = useState<RegisterPayloadProps>({
@@ -26,16 +30,14 @@ export default function Register() {
   const [isVerified, setIsVerified] = useState(false)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
-  const handleCaptchaChange = (token: string | null) => {
-    setCaptchaToken(token)
-    setIsVerified(!!token)
-  }
+  const strength = getPasswordStrength(formData.password)
 
   const registerMutation = useMutation({
     mutationFn: authService.register,
     onSuccess: (resp) => {
       toast.success(resp?.message)
       setIsOtp(true)
+      console.log(new Date(resp?.data?.expired_at))
     },
     onError: (error) => {
       const errorMessage = Array.isArray(error?.message) ? error?.message[0]?.msg : error?.message
@@ -66,6 +68,11 @@ export default function Register() {
     }
   })
 
+  function handleCaptchaChange(token: string | null) {
+    setCaptchaToken(token)
+    setIsVerified(!!token)
+  }
+
   function handleChangeFormData(key: string, value: string) {
     setFormData((prev) => {
       return {
@@ -92,7 +99,7 @@ export default function Register() {
       }}
       isVerifying={registerVerifyMutation.isPending}
       isResending={registerResendOtpMutation.isPending}
-      expiredAt={registerResendOtpMutation?.data?.data?.expired_at&&registerMutation?.data?.data?.expired_at}
+      expiredAt={registerResendOtpMutation?.data?.data?.expired_at??registerMutation?.data?.data?.expired_at}
     />
   )
 
@@ -119,14 +126,42 @@ export default function Register() {
         </div>
         <div className="grid gap-2">
           <Label htmlFor="password">Password</Label>
-          <Input 
-            id="password" 
-            type="password" 
-            name="password"
-            required 
-            value={formData.password}
-            onChange={(e) => handleChangeFormData(e.target.name, e.target.value)}
-          />
+          <div className="relative w-full max-w-sm">
+            <Input 
+              id="password" 
+              type={showPassword ? 'text' : "password"} 
+              name="password"
+              required 
+              value={formData.password}
+              onChange={(e) => handleChangeFormData(e.target.name, e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(prev => !prev)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+          {formData.password && (
+            <div className="space-y-1">
+              <div className="h-2 w-full bg-gray-200 rounded">
+                {strength === 'Weak'
+                  ? <div className="h-2 w-[33%] bg-red-400 rounded" />
+                  : strength === 'Medium'
+                    ? <div className="h-2 w-[66%] bg-yellow-400 rounded" />
+                    : <div className="h-2 w-[100%] bg-green-400 rounded" />
+                }
+              </div>
+              <p className={clsx('text-sm font-medium', {
+                'text-red-600': strength === 'Weak',
+                'text-yellow-600': strength === 'Medium',
+                'text-green-600': strength === 'Strong',
+              })}>
+                Strength: {strength}
+              </p>
+            </div>
+          )}
         </div>
         <div className='flex justify-center items-center'>
           <ReCAPTCHA

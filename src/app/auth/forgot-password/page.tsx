@@ -10,6 +10,9 @@ import { toast } from 'sonner'
 import Otp from '../_components/otp';
 import { useRouter } from 'next/navigation';
 import ReCAPTCHA from 'react-google-recaptcha'
+import { Eye, EyeOff } from 'lucide-react';
+import { getPasswordStrength } from '@/lib/password';
+import clsx from 'clsx';
 
 export default function ForgotPassword() {
   const router = useRouter()
@@ -21,8 +24,13 @@ export default function ForgotPassword() {
   const [password, setPassword] = useState<string>('')
   const [confirmPassword, setConfirmPassword] = useState<string>('')
 
+  const [showPassword, setShowPassword] = useState<boolean>(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
+
   const [isVerified, setIsVerified] = useState(false)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+
+  const strength = getPasswordStrength(password)
 
   const handleCaptchaChange = (token: string | null) => {
     setCaptchaToken(token)
@@ -90,21 +98,58 @@ export default function ForgotPassword() {
       <div className="grid gap-6">
         <div className="grid gap-2">
           <Label htmlFor="password">Password</Label>
-          <Input
-            id="password" 
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div className="relative w-full max-w-sm">
+            <Input
+              id="password" 
+              type={showPassword ? 'text' : "password"} 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(prev => !prev)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+          {password && (
+            <div className="space-y-1">
+              <div className="h-2 w-full bg-gray-200 rounded">
+                {strength === 'Weak'
+                  ? <div className="h-2 w-[33%] bg-red-400 rounded" />
+                  : strength === 'Medium'
+                    ? <div className="h-2 w-[66%] bg-yellow-400 rounded" />
+                    : <div className="h-2 w-[100%] bg-green-400 rounded" />
+                }
+              </div>
+              <p className={clsx('text-sm font-medium', {
+                'text-red-600': strength === 'Weak',
+                'text-yellow-600': strength === 'Medium',
+                'text-green-600': strength === 'Strong',
+              })}>
+                Strength: {strength}
+              </p>
+            </div>
+          )}
         </div>
         <div className="grid gap-2">
           <Label htmlFor="password">Confirm Password</Label>
-          <Input
-            id="confirm-password" 
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
+          <div className="relative w-full max-w-sm">
+            <Input
+              id="password" 
+              type={showConfirmPassword ? 'text' : "password"} 
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(prev => !prev)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+            >
+              {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
         </div>
         <Button 
           type="submit" 
